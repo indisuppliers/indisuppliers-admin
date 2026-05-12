@@ -3,10 +3,10 @@ import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import {
   LayoutDashboard, Users, UserCheck, UserX, Package,
-  ShoppingCart, CreditCard, BookOpen, MessageSquare,
-  Phone, Bell, Settings, Shield, ChevronDown, ChevronRight,
+  ShoppingCart, CreditCard, MessageSquare,
+  Bell, Settings, Shield, ChevronDown, ChevronRight,
   BarChart3, UserPlus, Activity, FileText, Wallet,
-  Receipt, Tags, AlertCircle, Mail
+  Receipt, Tags, AlertCircle, Mail, X
 } from 'lucide-react'
 
 const menuConfig = [
@@ -72,7 +72,7 @@ const menuConfig = [
   },
 ]
 
-export default function Sidebar() {
+export default function Sidebar({ onClose }) {
   const location = useLocation()
   const { user } = useAuth()
   const [collapsed, setCollapsed] = useState({})
@@ -87,40 +87,48 @@ export default function Sidebar() {
   return (
     <aside className="w-64 bg-gray-900 text-white flex flex-col h-screen overflow-hidden">
       {/* Logo */}
-      <div className="p-5 border-b border-gray-700 flex-shrink-0">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 bg-orange-500 rounded-lg flex items-center justify-center font-bold text-white text-sm">IS</div>
-          <div>
-            <h2 className="text-base font-bold text-white">IndiSuppliers</h2>
-            <p className="text-xs text-gray-400">Admin Panel</p>
+      <div className="p-4 border-b border-gray-700 flex-shrink-0">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 bg-orange-500 rounded-lg flex items-center justify-center font-bold text-white text-sm">IS</div>
+            <div>
+              <h2 className="text-base font-bold text-white">IndiSuppliers</h2>
+              <p className="text-xs text-gray-400">Admin Panel</p>
+            </div>
           </div>
+          {/* Close button - mobile only */}
+          <button
+            onClick={onClose}
+            className="lg:hidden p-1 text-gray-400 hover:text-white rounded"
+          >
+            <X size={20} />
+          </button>
         </div>
       </div>
 
       {/* User Info */}
       <div className="px-4 py-3 border-b border-gray-700 flex-shrink-0">
         <div className="flex items-center gap-3 bg-gray-800 rounded-lg px-3 py-2">
-          <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-xs font-bold">
+          <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">
             {user?.name?.charAt(0)?.toUpperCase()}
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-white truncate">{user?.name}</p>
             <p className="text-xs text-orange-400 capitalize">
-  {user?.customRole || (user?.role === 'super_admin' ? 'Super Admin' : user?.role?.replace('_', ' '))}
-</p>
+              {user?.customRole || (user?.role === 'super_admin' ? 'Super Admin' : user?.role?.replace('_', ' '))}
+            </p>
           </div>
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto py-2 scrollbar-thin">
+      <nav className="flex-1 overflow-y-auto py-2">
         {menuConfig.map((group) => {
           const isOpen = !collapsed[group.section]
           const sectionActive = isSectionActive(group.items)
 
           return (
             <div key={group.section} className="mb-1">
-              {/* Section Header */}
               <button
                 onClick={() => toggleSection(group.section)}
                 className={`w-full flex items-center justify-between px-4 py-2 text-xs font-semibold tracking-wider transition-colors ${
@@ -128,13 +136,9 @@ export default function Sidebar() {
                 }`}
               >
                 <span>{group.section}</span>
-                {isOpen
-                  ? <ChevronDown size={12} />
-                  : <ChevronRight size={12} />
-                }
+                {isOpen ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
               </button>
 
-              {/* Section Items */}
               {isOpen && (
                 <div className="mb-1">
                   {group.items.map((item) => {
@@ -144,7 +148,8 @@ export default function Sidebar() {
                       <Link
                         key={item.path}
                         to={item.path}
-                        className={`flex items-center gap-3 mx-2 px-3 py-2 rounded-lg mb-0.5 transition-all text-sm ${
+                        onClick={onClose}
+                        className={`flex items-center gap-3 mx-2 px-3 py-2.5 rounded-lg mb-0.5 transition-all text-sm ${
                           active
                             ? 'bg-orange-500 text-white font-medium'
                             : 'text-gray-400 hover:bg-gray-800 hover:text-white'
