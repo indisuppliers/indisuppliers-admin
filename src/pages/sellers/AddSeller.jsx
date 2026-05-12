@@ -2,11 +2,10 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import API from '../../api/axios'
 import toast from 'react-hot-toast'
-import { Camera, MapPin, X, Upload } from 'lucide-react'
+import { Camera, MapPin } from 'lucide-react'
 
 const BUSINESS_TYPES = ['Supplier & Trader', 'Manufacturer', 'Stockist', 'Shopkeeper', 'Bharatiya (Labour)']
 const STATES = ['Uttar Pradesh', 'Delhi', 'Maharashtra', 'Gujarat', 'Rajasthan', 'Punjab', 'Haryana', 'Bihar', 'Madhya Pradesh', 'Tamil Nadu', 'Karnataka', 'West Bengal', 'Andhra Pradesh', 'Telangana', 'Odisha', 'Assam']
-
 const PHOTO_TYPES = [
   { key: 'face', label: "Seller's Face", desc: 'Clear frontal photo of seller' },
   { key: 'shop_entrance', label: 'Shop Entrance', desc: 'External view of shop/factory' },
@@ -14,6 +13,16 @@ const PHOTO_TYPES = [
   { key: 'product_setup', label: 'Product/Equipment', desc: 'Evidence of business' },
   { key: 'seller_with_product', label: 'Seller with Product', desc: 'Proof of ownership' },
 ]
+
+const Field = ({ label, required, children, hint }) => (
+  <div className="mb-4">
+    <label className="block text-sm font-semibold text-gray-700 mb-1">
+      {label} {required && <span className="text-red-500">*</span>}
+    </label>
+    {hint && <p className="text-xs text-gray-400 mb-1">{hint}</p>}
+    {children}
+  </div>
+)
 
 export default function AddSeller() {
   const navigate = useNavigate()
@@ -47,7 +56,7 @@ export default function AddSeller() {
         toast.success('Location captured!')
         setLocationLoading(false)
       },
-      (err) => {
+      () => {
         toast.error('Location access denied')
         setLocationLoading(false)
       }
@@ -103,16 +112,6 @@ export default function AddSeller() {
     }
   }
 
-  const Field = ({ label, required, children, hint }) => (
-    <div className="mb-4">
-      <label className="block text-sm font-semibold text-gray-700 mb-1">
-        {label} {required && <span className="text-red-500">*</span>}
-      </label>
-      {hint && <p className="text-xs text-gray-400 mb-1">{hint}</p>}
-      {children}
-    </div>
-  )
-
   return (
     <div>
       <div className="mb-6">
@@ -122,23 +121,21 @@ export default function AddSeller() {
 
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-          {/* LEFT — Basic Info */}
           <div className="lg:col-span-2 space-y-4">
             <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
               <h2 className="text-base font-bold text-gray-800 mb-4 pb-2 border-b">Basic Information</h2>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Field label="Seller Name" required hint="Full business name">
                   <input type="text" value={form.name}
-                    onChange={e => setForm({...form, name: e.target.value})}
+                    onChange={e => setForm(prev => ({...prev, name: e.target.value}))}
                     className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-orange-500 outline-none"
                     placeholder="e.g. Rajesh Kumar Exports" required />
                 </Field>
 
                 <Field label="Phone Number" required hint="WhatsApp number preferred">
                   <input type="tel" value={form.phone}
-                    onChange={e => setForm({...form, phone: e.target.value.replace(/\D/g, '').slice(0, 10)})}
+                    onChange={e => setForm(prev => ({...prev, phone: e.target.value.replace(/\D/g, '').slice(0, 10)}))}
                     className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-orange-500 outline-none"
                     placeholder="9876543210" required />
                 </Field>
@@ -146,24 +143,24 @@ export default function AddSeller() {
 
               <Field label="Email Address" hint="Optional">
                 <input type="email" value={form.email}
-                  onChange={e => setForm({...form, email: e.target.value})}
+                  onChange={e => setForm(prev => ({...prev, email: e.target.value}))}
                   className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-orange-500 outline-none"
                   placeholder="seller@email.com" />
               </Field>
 
               <Field label="Business Type" required>
                 <select value={form.businessType}
-                  onChange={e => setForm({...form, businessType: e.target.value})}
+                  onChange={e => setForm(prev => ({...prev, businessType: e.target.value}))}
                   className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-orange-500 outline-none" required>
                   <option value="">Select business type</option>
                   {BUSINESS_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
                 </select>
               </Field>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Field label="State" required>
                   <select value={form.state}
-                    onChange={e => setForm({...form, state: e.target.value})}
+                    onChange={e => setForm(prev => ({...prev, state: e.target.value}))}
                     className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-orange-500 outline-none" required>
                     <option value="">Select state</option>
                     {STATES.map(s => <option key={s} value={s}>{s}</option>)}
@@ -171,7 +168,7 @@ export default function AddSeller() {
                 </Field>
                 <Field label="City" required>
                   <input type="text" value={form.city}
-                    onChange={e => setForm({...form, city: e.target.value})}
+                    onChange={e => setForm(prev => ({...prev, city: e.target.value}))}
                     className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-orange-500 outline-none"
                     placeholder="Noida, Delhi..." required />
                 </Field>
@@ -179,13 +176,12 @@ export default function AddSeller() {
 
               <Field label="Full Address">
                 <textarea value={form.address}
-                  onChange={e => setForm({...form, address: e.target.value})}
+                  onChange={e => setForm(prev => ({...prev, address: e.target.value}))}
                   className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-orange-500 outline-none"
                   rows={2} placeholder="Shop/factory full address" />
               </Field>
             </div>
 
-            {/* Location Section */}
             <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
               <h2 className="text-base font-bold text-gray-800 mb-4 pb-2 border-b flex items-center gap-2">
                 <MapPin size={18} className="text-orange-500" /> Location Verification
@@ -214,7 +210,6 @@ export default function AddSeller() {
             </div>
           </div>
 
-          {/* RIGHT — Live Photos */}
           <div>
             <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
               <h2 className="text-base font-bold text-gray-800 mb-1 flex items-center gap-2">
@@ -276,7 +271,6 @@ export default function AddSeller() {
           </div>
         </div>
 
-        {/* Submit */}
         <div className="flex gap-4 mt-6">
           <button type="submit" disabled={loading}
             className="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-xl transition-all disabled:opacity-50 max-w-sm">
